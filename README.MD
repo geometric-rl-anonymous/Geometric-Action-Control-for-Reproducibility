@@ -64,5 +64,6 @@ MIT License
 
 ------
 
+## 📫 Contact
 
-
+If you have questions regarding this repository, please contact us **via the anonymous ICLR OpenReview submission platform**.
