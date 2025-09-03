@@ -45,7 +45,7 @@ python eval_gac.py --checkpoint gac_pretrain_model/HalfCheetah-v4_step_500000.pt
 | Walker2d-v4    | 1M    | 5,889 ± 47          |
 | Humanoid-v4    | 1M    | 6,591 ± 53          |
 
-> 📍 Models were trained using default GAC settings: fixed radius $r=2.5$ and adaptive $\kappa$.
+> > 📍 Models were trained using default GAC settings: adaptive $\kappa$ and fixed radius $r=2.5$, except Ant-v4 which uses $r=1$.
 
 ------
 
