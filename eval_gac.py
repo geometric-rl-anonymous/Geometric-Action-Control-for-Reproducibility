@@ -16,43 +16,35 @@ class Args:
     test: float = 10
 
 
-
-
-
 def _load_gac():
     import torch
+    import ctypes
+    import sys
+    import os
+    import importlib.util
+
+
     torch_lib = os.path.join(os.path.dirname(torch.__file__), 'lib')
     libc10 = os.path.join(torch_lib, 'libc10.so')
     if os.path.exists(libc10):
         ctypes.CDLL(libc10, mode=ctypes.RTLD_GLOBAL)
 
 
-    try:
-        import gac_core
-        print("✅ GAC load successful")
-        return gac_core
-    except ImportError:
+    if not os.path.exists("gac.so"):
+        raise RuntimeError("❌ Cannot find gac.so")
 
-        import importlib.util
-        import glob
-
-        so_files = glob.glob("gac_core*.so")
-        if so_files:
-            spec = importlib.util.spec_from_file_location("gac_core", so_files[0])
-            gac_core = importlib.util.module_from_spec(spec)
-            sys.modules["gac_core"] = gac_core
-            spec.loader.exec_module(gac_core)
-            print(f"✅ GAC core is loaded from {so_files[0]}.")
-            return gac_core
-        else:
-            raise RuntimeError("❌ error：cannot find gac core, please make sure gac_core.so is in the current directory.")
-
+    spec = importlib.util.spec_from_file_location("gac_core", "gac.so")
+    gac_core = importlib.util.module_from_spec(spec)
+    sys.modules["gac_core"] = gac_core
+    sys.modules["gac"] = gac_core
+    spec.loader.exec_module(gac_core)
+    print("✅ GAC loaded successfully")
+    return gac_core
 
 
 gac_core = _load_gac()
 
-
-class VMFActorProtected(nn.Module):
+class GAC_Actor(nn.Module):
     def __init__(self, obs_dim, action_dim, args):
         super().__init__()
         self.args = args
@@ -131,7 +123,7 @@ def evaluate_gac(checkpoint_path, num_episodes=10, deterministic=True):
     action_dim = env.action_space.shape[0]
 
     # create Actor
-    actor = VMFActorProtected(obs_dim, action_dim, args).to(device)
+    actor = GAC_Actor(obs_dim, action_dim, args).to(device)
 
     # load weight
     state_dict = checkpoint['model_state_dict']
@@ -230,10 +222,10 @@ def main():
 
     if args.checkpoint is None:
         # choose envs
-        checkpoints = glob.glob("gac_pretrain_model/HalfCheetah-v4_step_500000.pt")
+        # checkpoints = glob.glob("gac_pretrain_model/HalfCheetah-v4_step_500000.pt")
         # checkpoints = glob.glob("gac_pretrain_model/Humanoid-v4_step_1000000.pt")
         # checkpoints = glob.glob("gac_pretrain_model/Ant-v4_step_500000.pt")
-        # checkpoints = glob.glob("gac_pretrain_model/Walker2d-v4_step_1000000.pt")
+        checkpoints = glob.glob("gac_pretrain_model/Walker2d-v4_step_1000000.pt")
 
         if checkpoints:
             checkpoints.sort(key=lambda x: int(x.split('_')[-1].split('.')[0]))
