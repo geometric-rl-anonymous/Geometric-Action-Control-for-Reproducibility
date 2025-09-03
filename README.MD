@@ -2,7 +2,7 @@
 
 Official evaluation code for **"Beyond Distributions: Geometric Action Control for Continuous Reinforcement Learning"**.
 
-This repo provides pretrained models and a minimal evaluation script for reproducibility.
+This repo provides pretrained models and a minimal evaluation script for reproducibility.🤗
 
 ---
 
